@@ -10,7 +10,6 @@ let offScreenCTX = offScreenCVS.getContext("2d");
   offScreenCVS.width = 100;
   offScreenCVS.height = 100;
   offScreenCTX.imageSmoothingEnabled = false;
-  offScreenCTX.fillRect(10,10,20,20);
 
 let rangeSlider = document.getElementById("sliderInput");
 let output = document.getElementById("demo");
@@ -34,9 +33,30 @@ onScreenCVS.addEventListener('click', handleClick)
 
 function handleClick(e) {
   // onScreenCVS.style.background = "blue";
+  let ratio = onScreenCVS.width/offScreenCVS.width;
   onScreenCTX.fillStyle = "#FF0000";
-  onScreenCTX.fillRect(e.offsetX-15,e.offsetY-15,30,30)
+  onScreenCTX.fillRect(e.offsetX,e.offsetY,30,30)
   offScreenCTX.fillStyle = "#FF0000";
-  offScreenCTX.fillRect(e.offsetX-15,e.offsetY-15,30,30)
-  source = onScreenCVS.toDataURL();
+  offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),Math.floor(30/ratio),Math.floor(30/ratio))
+  source = offScreenCVS.toDataURL();
 }
+
+const heightOutput = document.querySelector('#height');
+const widthOutput = document.querySelector('#width');
+
+function reportWindowSize() {
+  heightOutput.textContent = window.innerHeight;
+  widthOutput.textContent = window.innerWidth;
+  let baseDimension = window.innerHeight;
+  window.innerHeight > window.innerWidth ? baseDimension = window.innerWidth : baseDimension = window.innerHeight;
+//   let img = new Image;
+//   img.onload = () => {
+//     onScreenCVS.width = baseDimension*0.8;
+//     onScreenCVS.height = baseDimension*0.8;
+//     onScreenCTX.imageSmoothingEnabled = false;
+//     onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
+//   }
+//   img.src = source;
+}
+
+window.onresize = reportWindowSize;
