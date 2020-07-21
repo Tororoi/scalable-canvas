@@ -7,19 +7,22 @@
     <script defer src="index.js"></script>
   </head>
   <body>
-    <p>Resize the browser window to fire the <code>resize</code> event.</p>
+    <!-- <p>Resize the browser window to fire the <code>resize</code> event.</p>
     <p>Window height: <span id="height"></span></p>
-    <p>Window width: <span id="width"></span></p>
+    <p>Window width: <span id="width"></span></p> -->
     <div id="container">
         <div class="rangeSlider">
           <input type="range" 
                  min="1" 
-                 max="1000"
-                 value=400
-                 class="mySlider"                          id="sliderInput">
+                 max="4"
+                 value=2
+                 class="mySlider"                          
+                 id="sliderInput">
           <p>Scale: <span id="demo"></span></p> 
           </div>
-        <canvas id="onScreen" width="400" height="400"></canvas>
+        <div class="canvas-container">
+            <canvas id="onScreen"></canvas>
+        </div>
       </div>      
   </body>
 </html>
