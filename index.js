@@ -29,20 +29,39 @@ rangeSlider.oninput = function() {
   img.src = source;
 } 
 
-onScreenCVS.addEventListener('click', handleClick)
+onScreenCVS.addEventListener('mousemove', handleMouseMove);
+onScreenCVS.addEventListener('mousedown', handleMouseDown);
+onScreenCVS.addEventListener('mouseup', handleMouseUp);
 
-function handleClick(e) {
-  let ratio = onScreenCVS.width/offScreenCVS.width;
-  offScreenCTX.fillStyle = "#FF0000";
-  offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),1,1)
-  console.log(ratio)
-  source = offScreenCVS.toDataURL();
-  let img = new Image;
-  img.onload = () => {
-    onScreenCTX.imageSmoothingEnabled = false;
-    onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
-  }
-  img.src = source;
+let clicked = false;
+
+function handleMouseMove(e) {
+    if (clicked === true) {
+        draw(e)
+    }
+}
+
+function handleMouseDown(e) {
+    clicked = true;
+    draw(e)
+}
+
+function handleMouseUp(e) {
+    clicked = false;
+}
+
+function draw(e) {
+    let ratio = onScreenCVS.width/offScreenCVS.width;
+    offScreenCTX.fillStyle = "#FF0000";
+    offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),1,1)
+    console.log(ratio)
+    source = offScreenCVS.toDataURL();
+    let img = new Image;
+    img.onload = () => {
+      onScreenCTX.imageSmoothingEnabled = false;
+      onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
+    }
+    img.src = source;
 }
 
 const heightOutput = document.querySelector('#height');
