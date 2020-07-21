@@ -32,12 +32,10 @@ rangeSlider.oninput = function() {
 onScreenCVS.addEventListener('click', handleClick)
 
 function handleClick(e) {
-  // onScreenCVS.style.background = "blue";
   let ratio = onScreenCVS.width/offScreenCVS.width;
-//   onScreenCTX.fillStyle = "#FF0000";
-//   onScreenCTX.fillRect(e.offsetX,e.offsetY,30,30)
   offScreenCTX.fillStyle = "#FF0000";
-  offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),Math.floor(30/ratio),Math.floor(30/ratio))
+  offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),1,1)
+  console.log(ratio)
   source = offScreenCVS.toDataURL();
   let img = new Image;
   img.onload = () => {
