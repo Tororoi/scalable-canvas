@@ -1,48 +1,43 @@
-let container = document.getElementById("container");
-
+//Set onscreen canvas and its context
 let onScreenCVS = document.getElementById("onScreen");
 let onScreenCTX = onScreenCVS.getContext("2d");
 
-let rangeScale = 1;
+//Get the undo button
+let undoBtn = document.getElementById("undo");
+
+//Set initial size of canvas. If using a non-square, make sure to set the ratio the same as the offscreen canvas by multiplying either the height or width by the correct ratio.
 let baseDimension;
-let rect = onScreenCVS.parentNode.getBoundingClientRect();
-    rect.height > rect.width ? baseDimension = rect.width : baseDimension = rect.height;
+let rect;
+    setSize();
     onScreenCVS.width = baseDimension;
     onScreenCVS.height = baseDimension;
 
-console.log(baseDimension)
+//Create a history stack for the undo functionality
+let history = [onScreenCVS.toDataURL()];
+function getTopImage() {
+    return history[history.length-1]
+}
 
+//Create an Image with a default source of the existing onscreen canvas
+let img = new Image;
+let source = getTopImage();
 
-let source = onScreenCVS.toDataURL();
-
+//Create an offscreen canvas. This is where we will actually be drawing, in order to keep the image consistent and free of distortions.
 let offScreenCVS = document.createElement('canvas');
 let offScreenCTX = offScreenCVS.getContext("2d");
-  offScreenCVS.width = 100;
-  offScreenCVS.height = 100;
-  offScreenCTX.imageSmoothingEnabled = false;
+//Set the dimensions of the drawing canvas
+  offScreenCVS.width = 32;
+  offScreenCVS.height = 32;
 
-let rangeSlider = document.getElementById("sliderInput");
-let output = document.getElementById("demo");
-
-output.innerHTML = rangeSlider.value;
-
-rangeSlider.oninput = function() {
-  output.innerHTML = this.value;
-  rangeScale = this.value;
-//   let img = new Image;
-//   img.onload = () => {
-//     onScreenCVS.width = baseDimension*rangeScale;
-//     onScreenCVS.height = baseDimension*rangeScale;
-//     onScreenCTX.imageSmoothingEnabled = false;
-//     onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
-//   }
-//   img.src = source;
-} 
-
+//Add event listeners for the mouse moving, downclick, and upclick
 onScreenCVS.addEventListener('mousemove', handleMouseMove);
 onScreenCVS.addEventListener('mousedown', handleMouseDown);
 onScreenCVS.addEventListener('mouseup', handleMouseUp);
 
+//Add event listeners for the toolbox
+undoBtn.addEventListener('click', handleUndo)
+
+//We only want the mouse to move if the mouse is down, so we need a variable to disable drawing while the mouse is not clicked.
 let clicked = false;
 
 function handleMouseMove(e) {
@@ -53,41 +48,65 @@ function handleMouseMove(e) {
 
 function handleMouseDown(e) {
     clicked = true;
-    draw(e)
+    draw(e);
 }
 
-function handleMouseUp(e) {
+function handleMouseUp() {
     clicked = false;
+    //Push the image to the history
+    history.push(source)
 }
 
+function handleUndo() {
+  undo();
+}
+
+//Helper functions
+
+//Draw a single pixel on the canvas. Get the ratio of the difference in size of the on and offscreen canvases to calculate where to draw on the offscreen canvas based on the coordinates of clicking on the onscreen canvas.
 function draw(e) {
     let ratio = onScreenCVS.width/offScreenCVS.width;
-    offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),1,1)
-    console.log(ratio)
+    offScreenCTX.fillStyle = "red";
+    offScreenCTX.fillRect(Math.floor(e.offsetX/ratio),Math.floor(e.offsetY/ratio),1,1);
+    //Set the source of the image to the offscreen canvas
     source = offScreenCVS.toDataURL();
-    let img = new Image;
+    renderImage();
+}
+
+//Once the image is loaded, draw the image onto the onscreen canvas.
+function renderImage() {
     img.onload = () => {
+      //if the image is being drawn due to resizing, reset the width and height. Putting the width and height outside the img.onload function will make scaling smoother, but the image will flicker as you scale. Pick your poison.
+      onScreenCVS.width = baseDimension;
+      onScreenCVS.height = baseDimension;
+      //Prevent blurring
       onScreenCTX.imageSmoothingEnabled = false;
       onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
     }
     img.src = source;
 }
 
-// const heightOutput = document.querySelector('#height');
-// const widthOutput = document.querySelector('#width');
+//Undo the previous action
+function undo() {
+    history.pop();
+    source = getTopImage();
+    console.log(img.src);
+    console.log(history);
+    offScreenCTX.clearRect(0,0,offScreenCVS.width,offScreenCVS.height);
+    offScreenCTX.drawImage(img,0,0,offScreenCVS.width,offScreenCVS.height);
+    renderImage();
+}
 
-function flexCanvasSize() {
+//Get the size of the parentNode which is subject to flexbox. Fit the square by making sure the dimensions are based on the smaller of the width and height.
+function setSize() {
     rect = onScreenCVS.parentNode.getBoundingClientRect();
     rect.height > rect.width ? baseDimension = rect.width : baseDimension = rect.height;
+}
 
-    let img = new Image;
-    img.onload = () => {        
-        onScreenCVS.width = baseDimension;
-        onScreenCVS.height = baseDimension;
-        onScreenCTX.imageSmoothingEnabled = false;
-        onScreenCTX.drawImage(img,0,0,onScreenCVS.width,onScreenCVS.height)
-    }
-    img.src = source;
+//Resize the canvas if the window is resized
+function flexCanvasSize() {
+    setSize();
+    renderImage();
 }
 
 window.onresize = flexCanvasSize;
