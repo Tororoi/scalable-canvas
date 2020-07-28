@@ -41,7 +41,7 @@ undoBtn.addEventListener('click', handleUndo)
 let clicked = false;
 
 function handleMouseMove(e) {
-    if (clicked === true) {
+    if (clicked) {
         draw(e)
     }
 }
