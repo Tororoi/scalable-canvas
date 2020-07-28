@@ -58,7 +58,9 @@ function handleMouseUp() {
 }
 
 function handleUndo() {
-  undo();
+    if (history.length>1) {
+        undo();
+    }
 }
 
 //Helper functions
@@ -90,8 +92,7 @@ function renderImage() {
 function undo() {
     history.pop();
     source = getTopImage();
-    console.log(img.src);
-    console.log(history);
+    img.src = source;
     offScreenCTX.clearRect(0,0,offScreenCVS.width,offScreenCVS.height);
     offScreenCTX.drawImage(img,0,0,offScreenCVS.width,offScreenCVS.height);
     renderImage();
