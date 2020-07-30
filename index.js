@@ -2,8 +2,9 @@
 let onScreenCVS = document.getElementById("onScreen");
 let onScreenCTX = onScreenCVS.getContext("2d");
 
-//Get the undo button
+//Get the undo buttons
 let undoBtn = document.getElementById("undo");
+let redoBtn = document.getElementById("redo");
 
 //Set initial size of canvas. If using a non-square, make sure to set the ratio the same as the offscreen canvas by multiplying either the height or width by the correct ratio.
 let baseDimension;
@@ -13,9 +14,10 @@ let rect;
     onScreenCVS.height = baseDimension;
 
 //Create a history stack for the undo functionality
-let history = [onScreenCVS.toDataURL()];
+let undoStack = [onScreenCVS.toDataURL()];
+let redoStack = []
 function getTopImage() {
-    return history[history.length-1]
+    return undoStack[undoStack.length-1]
 }
 
 //Create an Image with a default source of the existing onscreen canvas
@@ -36,6 +38,7 @@ onScreenCVS.addEventListener('mouseup', handleMouseUp);
 
 //Add event listeners for the toolbox
 undoBtn.addEventListener('click', handleUndo)
+redoBtn.addEventListener('click', handleRedo)
 
 //We only want the mouse to move if the mouse is down, so we need a variable to disable drawing while the mouse is not clicked.
 let clicked = false;
@@ -54,12 +57,19 @@ function handleMouseDown(e) {
 function handleMouseUp() {
     clicked = false;
     //Push the image to the history
-    history.push(source)
+    undoStack.push(source)
+    redoStack = [];
 }
 
 function handleUndo() {
-    if (history.length>1) {
+    if (undoStack.length>1) {
         undo();
+    }
+}
+
+function handleRedo() {
+    if (redoStack.length>=1) {
+        redo();
     }
 }
 
@@ -90,7 +100,17 @@ function renderImage() {
 
 //Undo the previous action
 function undo() {
-    history.pop();
+    redoStack.push(undoStack.pop());
+    source = getTopImage();
+    img.src = source;
+    offScreenCTX.clearRect(0,0,offScreenCVS.width,offScreenCVS.height);
+    offScreenCTX.drawImage(img,0,0,offScreenCVS.width,offScreenCVS.height);
+    renderImage();
+}
+
+//Undo the previous action
+function redo() {
+    undoStack.push(redoStack.pop());
     source = getTopImage();
     img.src = source;
     offScreenCTX.clearRect(0,0,offScreenCVS.width,offScreenCVS.height);

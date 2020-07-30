@@ -1,4 +1,4 @@
-#container {
+  #container {
     width: 100%;
     height: 97vh;
     display: flex;
@@ -12,20 +12,42 @@
     background: #66CCCC;
   }
 
+  .toolbox {
+    margin: 8px;
+    display: flex;
+    flex-flow: column wrap;
+  }
+
   .undo-button {
+    user-select: none;
     width: 100px;
     text-align: center;
     color: white;
     height: 60px;
     border-radius: 10px;
-    background: red;
+    background: rgb(212, 45, 45);
     opacity: 1;
   }
-  
+
   .undo-button:hover {
     opacity: 0.8;
   }
-  
+
+  .redo-button {
+    user-select: none;
+    width: 100px;
+    text-align: center;
+    color: white;
+    height: 60px;
+    border-radius: 10px;
+    background: rgba(104, 233, 157, 0.849);
+    opacity: 1;
+  }
+
+  .redo-button:hover {
+    opacity: 0.8;
+  }
+
   .rangeSlider {
       width: 30%;
     /* display: none; */
